@@ -4,6 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAuthenticated
 
+from .permissions.permissions_validation import validate_user_permission
+
 from .serializers.user_serializers import UserSerializer
 from .serializers.permission_serializer import PermissionSerializer
 
@@ -18,6 +20,9 @@ class UserViewSet(GenericViewSet):
     def create(self, request, *args, **kwargs):
         user = request.user
 
+        # TODO: get module name and action dynamically
+        validate_user_permission(user=user, module_name="user", action="add")
+        
         new_user_data = request.data.copy()
         new_user_serializer = self.get_serializer(data=new_user_data)
 
@@ -36,7 +41,9 @@ class UserViewSet(GenericViewSet):
         )
     
     def list(self, request, *args, **kwargs):
-        
+        user = request.user
+
+        validate_user_permission(user=user, module_name="user", action="view")
         return Response(
             data={
                 "users": self.get_serializer(
@@ -49,6 +56,11 @@ class UserViewSet(GenericViewSet):
 
     @action(methods=["PATCH"], detail=True)
     def add_permissions(self, request, pk=None, *args, **kwargs):
+
+        user = request.user
+
+        validate_user_permission(user=user, module_name="user", action="change")
+
         body = request.data.copy()
         
         permission_ids = body.get("permission_ids", None)
@@ -66,9 +78,13 @@ class UserViewSet(GenericViewSet):
         )
     
 class PermissionViewSet(GenericViewSet):
+    permission_classes = [IsAuthenticated]
     serializer_class = PermissionSerializer
-    
+
     def list(self, request, *args, **kwargs):
+        user = request.user
+
+        validate_user_permission(user=user, module_name="permission", action="view")
         
         permissions_serializer = self.get_serializer(get_all_permissions(), many=True)
     
