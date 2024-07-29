@@ -4,9 +4,10 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class UserManager(BaseUserManager):
 
     def create_user(self, email, password, first_name, last_name, **extra_fields):
-        return self._create_user(email, password, first_name, last_name, password, **extra_fields)
+        return self._create_user(email, password, first_name, last_name, **extra_fields)
     
     def create_superuser(self, email, password, first_name, last_name, **extra_fields):
+        extra_fields.setdefault('is_staff',True)
         extra_fields.setdefault('is_superuser',True)
         return self._create_user(email, password, first_name, last_name, **extra_fields)
     
@@ -36,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()
