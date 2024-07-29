@@ -17,16 +17,24 @@ cd ErpSec
 
 ## Paso 2
 ### Crear un entorno virtual
-```python -m venv env```
+```bash
+python -m venv venv
+```
 
 ### Activar el entorno virtual (Windows)
-```.\env\Scripts\activate```
+```bash
+.\venv\Scripts\activate
+```
 
 ### Activar el entorno virtual (Linux/Mac)
-```source env/bin/activate```
+```bash
+source env/bin/activate
+```
 
 ## Paso 3 Instalar dependencias
-```pip install -r requirements.txt```
+```bash
+pip install -r requirements.txt
+```
 
 ## Paso 4 Configurar archivo .env
 
@@ -39,12 +47,18 @@ DB_HOST=db_host
 
 ## Paso 5 Ejecutar Migraciones
 
-```python manage.py migrate```
+```bash
+python manage.py migrate
+```
 
 ## Paso 6 Crear superuser
 
-```python manage.py createsuperuser```
+```bash
+python manage.py createsuperuser
+```
 
 ## Paso 7 Ejecutar Servidor
 
-```python manage.py runserver```
+```bash 
+python manage.py runserver
+```
