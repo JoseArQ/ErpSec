@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     ## REST FRAMEWORK
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     ## LOCAL APPS
     'user',
 ]
