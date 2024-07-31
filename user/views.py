@@ -11,7 +11,7 @@ from .serializers.permission_serializer import PermissionSerializer
 from .serializers.group_serializers import GroupSerializer
 
 from .services.user_services import create_user, add_permissions_to_user
-from .services.group_services import create_group
+from .services.group_services import create_group, add_permissions_to_group
 
 from .selectors.user_selectors import get_all_users
 from .selectors.permission_selectors import get_all_permissions
@@ -108,10 +108,10 @@ class GroupViewSet(GenericViewSet):
         validate_user_permission(user=user, module_name="group", action="add")
         
         group_data = request.data.copy()
-        rol_serializer = self.get_serializer(data=group_data)
-        if not rol_serializer.is_valid():
+        group_serializer = self.get_serializer(data=group_data)
+        if not group_serializer.is_valid():
             return Response(
-                data={"errors": rol_serializer.errors},
+                data={"errors": group_serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -119,7 +119,7 @@ class GroupViewSet(GenericViewSet):
     
         return Response(
             data={
-                "rol": self.get_serializer(instance=group).data, 
+                "group": self.get_serializer(instance=group).data, 
             },
             status=status.HTTP_200_OK
             )
@@ -135,3 +135,20 @@ class GroupViewSet(GenericViewSet):
             },
             status=status.HTTP_200_OK
         )
+    
+    @action(methods=["PATCH"], detail=True)
+    def add_permissions(self, request, pk=None, *args, **kwargs):
+        group_data = request.data.copy()
+
+        group_serializer = self.get_serializer(data=group_data)
+        if not group_serializer.is_valid():
+            return Response(
+                data={"errors": group_serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        group = add_permissions_to_group(group_id=pk, permission_ids=group_data.get("permissions"))
+        return Response(
+            data={"group": self.get_serializer(instance=group).data}, 
+            status=status.HTTP_200_OK
+            )
