@@ -1,17 +1,21 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from .permissions.permissions_validation import validate_user_permission
 
 from .serializers.user_serializers import UserSerializer
 from .serializers.permission_serializer import PermissionSerializer
+from .serializers.group_serializers import GroupSerializer
 
 from .services.user_services import create_user, add_permissions_to_user
+from .services.group_services import create_group
+
 from .selectors.user_selectors import get_all_users
 from .selectors.permission_selectors import get_all_permissions
+from .selectors.group_selectors import get_all_groups
 
 class UserViewSet(GenericViewSet):
     permission_classes = [IsAuthenticated]
@@ -95,3 +99,35 @@ class PermissionViewSet(GenericViewSet):
             status=status.HTTP_200_OK
             )
     
+class GroupViewSet(GenericViewSet):
+    queryset = get_all_groups()
+    serializer_class = GroupSerializer
+    
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        validate_user_permission(user=user, module_name="group", action="add")
+        
+        group_data = request.data.copy()
+        rol_serializer = self.get_serializer(data=group_data)
+        if not rol_serializer.is_valid():
+            return Response(
+                data={"errors": rol_serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        group = create_group(group_data=group_data)
+    
+        return Response(
+            data={
+                "rol": self.get_serializer(instance=group).data, 
+            },
+            status=status.HTTP_200_OK
+            )
+    
+    def list(self, request, *args, **kwargs):
+        return Response(
+            data={
+                "groups": self.get_serializer(self.get_queryset(), many=True).data
+            },
+            status=status.HTTP_200_OK
+        )
