@@ -125,6 +125,10 @@ class GroupViewSet(GenericViewSet):
             )
     
     def list(self, request, *args, **kwargs):
+
+        user = request.user
+        validate_user_permission(user=user, module_name="group", action="view")
+
         return Response(
             data={
                 "groups": self.get_serializer(self.get_queryset(), many=True).data
