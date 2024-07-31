@@ -15,4 +15,4 @@ def add_permissions_to_user(*, user_id : int, permission_ids : List[int]):
     if not permission_exist(permission_ids=permission_ids):
         raise ValueError(f'not found permissions {permission_ids}')
     
-    user.user_permissions.add(**permission_ids)
+    user.user_permissions.add(*permission_ids)
